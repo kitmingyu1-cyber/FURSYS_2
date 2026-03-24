@@ -1,422 +1,231 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html class="light" lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Office Order Validation Tool</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .glass-panel { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); border: 1px solid #e5e7eb; }
-        .spinner { width: 40px; height: 40px; border: 4px solid rgba(59, 130, 246, 0.2); border-left-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Smooth transitions */
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VISION AI - B2B Verification System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+              "surface-container-low": "#f2f4f6",
+              "on-surface": "#191c1e",
+              "surface-container-highest": "#e0e3e5",
+              "on-primary": "#ffffff",
+              "surface-container-high": "#e6e8ea",
+              "outline-variant": "#c2c6d6",
+              "secondary": "#006c49",
+              "on-surface-variant": "#424754",
+              "primary": "#0058be",
+              "surface": "#f7f9fb",
+              "background": "#f7f9fb",
+              "surface-container": "#eceef0",
+              "outline": "#727785",
+              "primary-container": "#2170e4",
+              "on-secondary-container": "#00714d",
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+    },
+}
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+body { font-family: 'Inter', sans-serif; }
+</style>
 </head>
-<body class="text-slate-800 h-screen flex overflow-hidden">
+<body class="bg-surface text-on-surface antialiased min-h-screen">
+<!-- TopNavBar -->
+<nav class="w-full top-0 sticky bg-[#f7f9fb] z-50 border-b border-outline-variant/30">
+    <div class="flex justify-between items-center w-full px-8 h-16 bg-[#f2f4f6]">
+        <div class="flex items-center gap-8">
+            <span class="text-xl font-bold tracking-tighter text-[#0058be] uppercase font-['Inter']">VISION AI</span>
+            <div class="hidden md:flex gap-6 items-center h-full">
+                <a class="text-[#0058be] font-semibold border-b-2 border-[#0058be] pb-1 font-['Inter']" href="#">Dashboard</a>
+                <a class="text-[#424754] hover:text-[#0058be] transition-colors font-['Inter']" href="#">History</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="p-2 rounded-full hover:bg-white transition-all"><span class="material-symbols-outlined text-on-surface-variant">notifications</span></button>
+            <div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden ml-2 flex items-center justify-center">
+                <span class="material-symbols-outlined">person</span>
+            </div>
+        </div>
+    </div>
+</nav>
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-white flex flex-col shrink-0 shadow-xl z-20">
-        <div class="h-16 flex items-center px-6 border-b border-slate-800 font-bold text-xl tracking-wide gap-2">
-            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-            VISION AI
+<div class="flex">
+    <!-- SideNavBar -->
+    <aside class="h-[calc(100vh-64px)] w-64 sticky left-0 top-16 bg-[#f2f4f6] border-r border-[#e0e3e5] hidden md:flex flex-col p-4 gap-2">
+        <div class="mb-6 px-2">
+            <div class="flex items-center gap-3 mb-1">
+                <div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">visibility</span>
+                </div>
+                <div>
+                    <h2 class="text-lg font-black text-[#191c1e] leading-tight">Fursys Office</h2>
+                    <p class="text-xs text-on-surface-variant opacity-70">Enterprise Tier</p>
+                </div>
+            </div>
         </div>
-        <div class="px-6 py-4 border-b border-slate-800">
-            <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-1">Fursys Office</h2>
-            <p class="text-xs text-blue-400 font-medium">Enterprise Tier</p>
-        </div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-blue-600/20 text-blue-400 rounded-lg font-medium transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                Dashboard
-            </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg font-medium transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                Audit Logs
-            </a>
+        <nav class="flex-1 space-y-1">
+            <div class="flex items-center gap-3 px-3 py-2 text-[#0058be] bg-white rounded-lg shadow-sm cursor-pointer transition-transform duration-200 hover:translate-x-1">
+                <span class="material-symbols-outlined">dashboard</span><span class="font-medium text-sm">Dashboard</span>
+            </div>
+            <div class="flex items-center gap-3 px-3 py-2 text-[#424754] hover:bg-[#e0e3e5] rounded-lg cursor-pointer transition-transform duration-200 hover:translate-x-1">
+                <span class="material-symbols-outlined">verified_user</span><span class="font-medium text-sm">Audit Logs</span>
+            </div>
         </nav>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-slate-50 relative">
-        <!-- Top Header (Settings) -->
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 sticky top-0 z-10 shadow-sm">
-            <h1 class="text-xl font-bold text-slate-800 truncate">퍼시스 오피스 주문품 자동 검증 시스템</h1>
-            
-            <div class="flex items-center gap-4 bg-slate-50 px-4 py-1.5 rounded-lg border border-slate-200">
-                <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-slate-600">OpenAI API Key:</span>
-                    <input type="password" id="apiKey" value="sk-proj-Irq3zcS0iQ-uSvPTQqe6SojhZjcf-9BhnZn03sQmX89NorPswQ5tJcXbMPWddncn6V0eUKNVyUT3BlbkFi6zCu1A--MM29_T1lo4DQ73Drd76hUXuAlOsYDL_jWELX93Gfb3TnZlK77PsZMhw8z9_jQR7SEA" class="border border-slate-300 rounded px-2 py-1 text-sm w-48 focus:ring-1 focus:ring-blue-500 focus:outline-none bg-white">
-                </div>
-                <div class="w-px h-6 bg-slate-300"></div>
-                <label class="flex items-center gap-2 cursor-pointer group">
-                    <input type="checkbox" id="mockMode" class="w-4 h-4 text-blue-600 rounded cursor-pointer">
-                    <span class="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">Test Mode</span>
-                </label>
-            </div>
+    <!-- Main Content Area -->
+    <main class="flex-1 p-8 max-w-7xl mx-auto w-full overflow-y-auto h-[calc(100vh-64px)]">
+        <header class="mb-10">
+            <h1 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">퍼시스 오피스 주문품 자동 검증 시스템</h1>
+            <p class="text-on-surface-variant max-w-2xl text-lg">AI 기반의 정밀 대조 알고리즘을 통해 ERP 데이터와 실제 주문 품목 간의 불일치를 실시간으로 탐지합니다.</p>
         </header>
 
-        <!-- Scrollable Content -->
-        <div class="p-8 max-w-7xl mx-auto w-full space-y-6">
-            
-            <!-- Description -->
-            <p class="text-slate-500 text-lg">
-                AI 기반의 정밀 대조 알고리즘을 통해 ERP 데이터와 실제 주문 품목 간의 불일치를 실시간으로 탐지합니다. <br>
-                <span class="text-sm text-blue-500 bg-blue-50 px-2 py-0.5 rounded mt-1 inline-block border border-blue-100">※ Test Mode 체크 해제 시, API Key를 사용해 실제 이미지를 읽고 분석합니다.</span>
-            </p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <!-- Left Column: Upload -->
-                <section class="glass-panel p-6 flex flex-col h-full">
-                    <div class="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
-                        <h2 class="text-lg font-bold flex items-center gap-2 text-slate-800">
-                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                            검증 데이터 업로드
-                        </h2>
-                        <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full uppercase tracking-wide border border-blue-100">Required 2/2</span>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <!-- Left Column - Image Uploads -->
+            <section class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary">upload_file</span> 검증 데이터 업로드
+                    </h2>
+                    <span class="text-xs font-medium text-primary px-2 py-1 bg-primary/10 rounded-full uppercase tracking-wider">Required 2/2</span>
+                </div>
+                <div class="space-y-4">
+                    <!-- ERP Upload Zone -->
+                    <div id="drop1" class="group relative bg-[#ffffff] border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center transition-all duration-300 hover:border-primary cursor-pointer min-h-[220px] overflow-hidden">
+                        <input type="file" id="file1" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+                        <div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary">analytics</span>
+                        </div>
+                        <h3 class="font-bold text-on-surface text-lg mb-1 relative z-10 pointer-events-none">ERP 화면 업로드</h3>
+                        <p class="text-on-surface-variant text-sm text-center mb-4 relative z-10 pointer-events-none">ERP 시스템의 주문 내역 이미지를 업로드하세요.</p>
+                        <img id="img1" src="" class="absolute inset-0 w-full h-full object-contain bg-white z-10 rounded-xl" style="display:none;" />
                     </div>
 
-                    <div class="space-y-4 flex-1">
-                        <!-- ERP Image -->
-                        <div class="relative group border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:border-blue-400 hover:bg-blue-50/30 transition-all cursor-pointer h-40 flex flex-col justify-center items-center overflow-hidden">
-                            <div id="erpPlaceholder" class="relative z-20 pointer-events-none">
-                                <h3 class="font-bold text-slate-700 mb-1">1) ERP System Screen</h3>
-                                <span class="text-sm text-slate-400">클릭하거나 이미지를 드래그하세요</span>
-                            </div>
-                            <input type="file" id="erpFile" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30">
-                            <img id="erpPreview" class="absolute inset-0 w-full h-full object-contain p-2 hidden z-10 bg-white" src="">
+                    <!-- Order Item Upload Zone -->
+                    <div id="drop2" class="group relative bg-[#ffffff] border-2 border-dashed border-outline-variant rounded-xl p-8 flex flex-col items-center justify-center transition-all duration-300 hover:border-primary cursor-pointer min-h-[220px] overflow-hidden">
+                        <input type="file" id="file2" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" />
+                        <div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-primary">inventory_2</span>
                         </div>
+                        <h3 class="font-bold text-on-surface text-lg mb-1 relative z-10 pointer-events-none">주문품 화면 업로드</h3>
+                        <p class="text-on-surface-variant text-sm text-center mb-4 relative z-10 pointer-events-none">실제 출고 예정인 주문 품목 화면을 업로드하세요.</p>
+                        <img id="img2" src="" class="absolute inset-0 w-full h-full object-contain bg-white z-10 rounded-xl" style="display:none;" />
+                    </div>
+                </div>
+                <button id="analyzeBtn" disabled class="w-full h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-lg font-bold text-lg shadow-lg shadow-primary/20 flex items-center justify-center gap-3 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed group">
+                    <span class="material-symbols-outlined group-hover:rotate-12 transition-transform">auto_awesome</span> 교차 검증 시작 (AI 분석)
+                </button>
+            </section>
 
-                        <!-- Order Image -->
-                        <div class="relative group border-2 border-dashed border-slate-300 rounded-xl p-4 text-center hover:border-blue-400 hover:bg-blue-50/30 transition-all cursor-pointer h-40 flex flex-col justify-center items-center overflow-hidden">
-                            <div id="orderPlaceholder" class="relative z-20 pointer-events-none">
-                                <h3 class="font-bold text-slate-700 mb-1">2) Order System Screen</h3>
-                                <span class="text-sm text-slate-400">클릭하거나 이미지를 드래그하세요</span>
-                            </div>
-                            <input type="file" id="orderFile" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30">
-                            <img id="orderPreview" class="absolute inset-0 w-full h-full object-contain p-2 hidden z-10 bg-white" src="">
+            <!-- Right Column - Persistent Result Dashboard -->
+            <section class="lg:sticky lg:top-24 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <span class="material-symbols-outlined text-secondary">task_alt</span> 검증 결과
+                    </h2>
+                    <span class="text-xs font-medium text-secondary px-2 py-1 bg-secondary/10 rounded-full uppercase tracking-wider">Real-time status</span>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm border border-outline-variant/30 border-l-4 border-l-secondary space-y-6 relative overflow-hidden min-h-[500px]">
+                    
+                    <!-- Ready State -->
+                    <div id="stateReady" class="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center p-8 text-center" style="display: flex;">
+                        <span class="material-symbols-outlined text-outline text-6xl mb-4 opacity-50">account_tree</span>
+                        <h3 class="text-xl font-bold text-on-surface mb-2">검증 대기 중</h3>
+                        <p class="text-on-surface-variant">좌측 영역에 두 화면을 모두 업로드한 뒤<br>하단의 <strong>교차 검증 시작</strong> 버튼을 눌러주세요.</p>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="stateLoading" class="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center p-8 text-center" style="display: none;">
+                        <div class="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-6"></div>
+                        <h3 class="text-xl font-bold text-on-surface mb-2">AI 교차 검증 중...</h3>
+                        <p id="loadingText" class="text-sm text-on-surface-variant mb-6">이미지 데이터 분석을 준비합니다...</p>
+                        <div class="w-full max-w-xs h-2 bg-surface-container rounded-full overflow-hidden">
+                            <div id="progress" class="h-full bg-primary transition-all duration-300 w-0"></div>
                         </div>
                     </div>
 
-                    <div class="mt-6 flex gap-3 w-full">
-                        <button id="resetBtn" class="w-1/4 bg-white hover:bg-slate-50 active:scale-[0.98] text-slate-600 font-bold py-3.5 rounded-xl shadow-sm border border-slate-200 transition-all flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            초기화
-                        </button>
-                        <button id="verifyBtn" class="w-3/4 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 group">
-                            <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                            교차 검증 시작 (AI 분석)
-                        </button>
-                    </div>
-                </section>
-
-                <!-- Right Column: Results -->
-                <section class="flex flex-col h-full relative">
-                    <!-- Loading Mask -->
-                    <div id="loadingSection" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 hidden flex-col items-center justify-center rounded-xl border border-blue-100 shadow-xl">
-                        <div class="spinner mb-4"></div>
-                        <h3 class="font-bold text-blue-900 text-lg">AI Vision Analysys</h3>
-                        <p id="loadingText" class="text-blue-600/80 text-sm mt-1">GPT-4o Vision API 호출 중...</p>
-                    </div>
-
-                    <div id="initPlaceholder" class="glass-panel p-6 flex flex-col items-center justify-center text-center h-full text-slate-400 border-dashed border-2">
-                        <svg class="w-16 h-16 mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <p class="font-medium text-lg text-slate-500">대기 중</p>
-                        <p class="text-sm mt-1">좌측 영역에 이미지를 업로드한 후 검증을 시작하세요.</p>
-                    </div>
-
-                    <!-- Result Panel -->
-                    <div id="resultCard" class="glass-panel p-6 hidden flex-col h-full fade-in ring-1 ring-blue-100 shadow-lg shadow-blue-900/5">
-                        <div class="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
-                            <h2 class="text-lg font-bold flex items-center gap-2 text-slate-800">
-                                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                검증 결과
-                            </h2>
-                            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full tracking-wide">REAL-TIME STATUS</span>
-                        </div>
-
-                        <!-- Final Verdict Box -->
-                        <div id="verdictBox" class="rounded-xl p-4 mb-5 flex items-center gap-4 transition-colors">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-white/50" id="verdictIconBox">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="verdictIcon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <!-- Done State -->
+                    <div id="stateDone" class="p-6 h-full flex flex-col justify-between" style="display: none;">
+                        <div>
+                            <!-- Metric Card -->
+                            <div class="bg-secondary/10 rounded-lg p-5 border border-secondary/20 flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-white shrink-0">
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">security</span>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-on-secondary-container opacity-80 uppercase tracking-tight">Security Check</p>
+                                    <h4 class="text-2xl font-black text-on-secondary-container">하자 발생 가능성: 낮음</h4>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-xs font-bold uppercase tracking-wide opacity-80 mb-0.5">SECURITY CHECK</p>
-                                <h3 class="text-xl font-black tracking-tight" id="verdictRisk">하자 발생 가능성: 판정중</h3>
-                            </div>
-                        </div>
-
-                        <!-- Summary Cards -->
-                        <div class="grid grid-cols-3 gap-3 mb-6">
-                            <div class="border border-slate-200 rounded-lg p-3 text-center bg-slate-50" id="cardCode">
-                                <p class="text-xs font-semibold text-slate-500 mb-1">Product Code</p>
-                                <p class="font-bold text-lg text-slate-800" id="resCode">0<span class="text-xs ml-0.5 text-slate-400">건</span></p>
-                            </div>
-                            <div class="border border-slate-200 rounded-lg p-3 text-center bg-slate-50" id="cardColor">
-                                <p class="text-xs font-semibold text-slate-500 mb-1">Color Code</p>
-                                <p class="font-bold text-lg text-slate-800" id="resColor">0<span class="text-xs ml-0.5 text-slate-400">건</span></p>
-                            </div>
-                            <div class="border border-slate-200 rounded-lg p-3 text-center bg-slate-50" id="cardQty">
-                                <p class="text-xs font-semibold text-slate-500 mb-1">Quantity</p>
-                                <p class="font-bold text-lg text-slate-800" id="resQty">0<span class="text-xs ml-0.5 text-slate-400">건</span></p>
-                            </div>
-                        </div>
-
-                        <!-- Detail Table (MANDATORY STRUCTURE) -->
-                        <div class="flex-1 overflow-hidden border border-slate-200 rounded-lg mb-4 flex flex-col bg-white">
-                            <div class="overflow-y-auto max-h-48">
-                                <table class="w-full text-left text-sm text-slate-600">
-                                    <thead class="bg-slate-50 text-xs uppercase font-bold text-slate-500 sticky top-0 shadow-sm z-10 border-b border-slate-200">
+                            
+                            <!-- Data Table -->
+                            <div class="overflow-hidden rounded-lg border border-outline-variant/30 mb-6">
+                                <table class="w-full text-left">
+                                    <thead class="bg-surface-container-low">
                                         <tr>
-                                            <th class="px-4 py-3">Product Code</th>
-                                            <th class="px-4 py-3">ERP <span class="font-normal">(Color/Qty)</span></th>
-                                            <th class="px-4 py-3">Order <span class="font-normal">(Color/Qty)</span></th>
-                                            <th class="px-4 py-3">Issue Type</th>
+                                            <th class="px-4 py-3 text-xs font-bold text-on-surface-variant uppercase">단품코드</th>
+                                            <th class="px-4 py-3 text-xs font-bold text-on-surface-variant uppercase">색상 불일치</th>
+                                            <th class="px-4 py-3 text-xs font-bold text-on-surface-variant uppercase">수량 불일치</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="resultTableBody" class="divide-y divide-slate-100">
+                                    <tbody class="divide-y divide-outline-variant/20">
+                                        <tr class="hover:bg-surface-bright transition-colors">
+                                            <td class="px-4 py-4 text-sm font-medium text-on-surface">모든 코드 일치</td>
+                                            <td class="px-4 py-4 text-sm"><span class="px-2 py-1 bg-secondary/10 text-secondary rounded text-xs font-bold">0건</span></td>
+                                            <td class="px-4 py-4 text-sm"><span class="px-2 py-1 bg-secondary/10 text-secondary rounded text-xs font-bold">0건</span></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
+                            
+                            <!-- Secondary Info -->
+                            <div class="flex gap-4 p-4 bg-surface-container rounded-lg items-start mb-6">
+                                <span class="material-symbols-outlined text-on-surface-variant mt-0.5">info</span>
+                                <div class="text-sm text-on-surface-variant">
+                                    <strong>분석 완료:</strong> 교차 검증 성공<br/>모든 데이터가 ERP 및 주문 내역과 100% 일치합니다.
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Main Issue Explanation -->
-                        <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 text-sm text-slate-700 leading-relaxed font-medium">
-                            <span class="font-bold text-slate-900 inline-block mb-1">📌 주요 의견 (Main Issue):</span><br>
-                            <span id="resCause"></span>
-                        </div>
+                        <!-- Secondary Button -->
+                        <button id="resetBtn" class="w-full py-3 border-2 border-outline-variant text-on-surface-variant font-bold rounded-lg hover:bg-surface-container-low hover:border-outline transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">refresh</span> 새로운 검증하기
+                        </button>
                     </div>
-                </section>
-            </div>
+                </div>
+
+                <!-- Extra Insight Card -->
+                <div class="bg-primary/5 rounded-xl p-6 border border-primary/10 relative overflow-hidden group">
+                    <div class="absolute -right-8 -top-8 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <h4 class="text-sm font-bold text-primary mb-2 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">lightbulb</span> AI 인사이트
+                    </h4>
+                    <p class="text-sm text-on-surface-variant leading-relaxed">
+                        모든 단품코드와 색상, 비율이 완벽히 매칭되었습니다. 시스템 상의 에러율이 0%로 안정적인 상태입니다.
+                    </p>
+                </div>
+            </section>
         </div>
     </main>
+</div>
 
-    <script>
-        let erpBase64 = null;
-        let orderBase64 = null;
-
-        function setupFile(idInput, idPreview, idPlace) {
-            document.getElementById(idInput).addEventListener('change', e => {
-                if(e.target.files && e.target.files[0]) {
-                    const r = new FileReader();
-                    r.onload = ev => {
-                        const b64 = ev.target.result;
-                        if(idInput === 'erpFile') erpBase64 = b64;
-                        else orderBase64 = b64;
-                        document.getElementById(idPreview).src = b64;
-                        document.getElementById(idPreview).classList.remove('hidden');
-                        document.getElementById(idPlace).classList.add('hidden');
-                    };
-                    r.readAsDataURL(e.target.files[0]);
-                }
-            });
-        }
-        setupFile('erpFile', 'erpPreview', 'erpPlaceholder');
-        setupFile('orderFile', 'orderPreview', 'orderPlaceholder');
-
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            erpBase64 = null; orderBase64 = null;
-            document.getElementById('erpFile').value = '';
-            document.getElementById('orderFile').value = '';
-            document.getElementById('erpPreview').src = '';
-            document.getElementById('orderPreview').src = '';
-            document.getElementById('erpPreview').classList.add('hidden');
-            document.getElementById('orderPreview').classList.add('hidden');
-            document.getElementById('erpPlaceholder').classList.remove('hidden');
-            document.getElementById('orderPlaceholder').classList.remove('hidden');
-            document.getElementById('resultCard').classList.add('hidden');
-            document.getElementById('resultCard').classList.remove('flex');
-            document.getElementById('initPlaceholder').classList.remove('hidden');
-        });
-
-        document.getElementById('verifyBtn').addEventListener('click', async () => {
-            const isMock = document.getElementById('mockMode').checked;
-            const apiKey = document.getElementById('apiKey').value.trim();
-
-            if (!isMock && !apiKey) {
-                alert("Please provide an OpenAI API Key or enable Test Mode.");
-                return;
-            }
-            if (!erpBase64 || !orderBase64) {
-                alert("Please upload both ERP and Order System images first.");
-                return;
-            }
-
-            document.getElementById('initPlaceholder').classList.add('hidden');
-            document.getElementById('resultCard').classList.add('hidden');
-            const lSec = document.getElementById('loadingSection');
-            lSec.classList.remove('hidden');
-            lSec.classList.add('flex');
-            
-            try {
-                let resultObj;
-                if(isMock) {
-                    document.getElementById('loadingText').innerText = "Running Mock validation (Simulating mismatch)...";
-                    await new Promise(r => setTimeout(r, 1200));
-                    // Fake a mismatch as requested by user's screenshot showing 061 vs 001
-                    resultObj = {
-                        errorSummary: { codeMismatch: 0, colorMismatch: 1, quantityMismatch: 0 },
-                        details: [
-                            { productCode: 'FDF0000J', erp: 'WW / 1', order: 'WW / 1', issue: '일치 (정상)' },
-                            { productCode: 'FDF0018N', erp: '061 / 1', order: '001 / 1', issue: '색상 불일치' }
-                        ],
-                        finalVerdict: { level: 'High', cause: '단품코드 FDF0018N에서 색상 불일치가 발생했습니다. ERP에는 061 색상으로 등록되어 있으나, 주문품 시스템 화면에는 001로 입력되어 있습니다. 발주 전 반드시 일치시켜야 합니다.' }
-                    };
-                } else {
-                    document.getElementById('loadingText').innerText = "Analyzing tables via GPT-4o Vision API...";
-                    const prompt = `You are a strict data validation system.
-Image 1 is the ERP system. Image 2 is the Order system.
-CRITICAL MATCHING RULE: 
-- ERP System (Image 1): Look for "기준 단품 코드" (Baseline Product Code). Extract it along with Color and Quantity.
-- Order System (Image 2): Extract "확정 단품코드" (Confirmed Code) and "확정 제품명(한글)" (Product Name).
-- MUST pair rows between Image 1 and 2 exactly using either of these methods:
-  Method 1: Order System's "기준 단품코드" exactly matches ERP's "기준 단품 코드".
-  Method 2 (User Rule): If the string at the BEGINNING of Order System's "확정 제품명(한글)" matches the ERP's "기준 단품 코드" (e.g. Order Name "FGS0024A-형태-110V..." matches ERP Code "FGS0024A"), they are considered a SUCCESSFUL MATCH (Pass/합격).
-- If paired successfully by either method, the code mapping is '일치 (정상)'.
-
-Validation Rule:
-Compare the Color and Quantity of the matched pairs based on their '기준 단품코드'. 
-
-Output ONLY a JSON object (no markdown, no extra text) with EXACT format:
-{
-  "errorSummary": { "codeMismatch": <int>, "colorMismatch": <int>, "quantityMismatch": <int> },
-  "details": [
-     { "productCode": "<Image 1 기준 단품 코드>", "erp": "<ERP Color> / <ERP Qty>", "order": "[<확정단품코드명>] <Order Color> / <Order Qty>", "issue": "<Korean short desc, e.g., '코드 불일치', '색상 불일치', '수량 불일치', or '일치 (정상)'>" }
-  ],
-  "finalVerdict": { "level": "<High/Medium/Low>", "cause": "<1-2 sentence Korean explanation. E.g. 확정 제품명(FGS0024A-...) 앞부분에 기준 단품코드가 명시되어 정상 매칭되었습니다.>" }
-}`;
-                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                        method:'POST',
-                        headers:{'Content-Type':'application/json', 'Authorization': `Bearer ${apiKey}`},
-                        body:JSON.stringify({
-                            model:"gpt-4o",
-                            messages:[
-                                {role:"system", content:prompt},
-                                {role:"user", content:[
-                                    {type:"text", text:"Image 1 (ERP):"},
-                                    {type:"image_url", image_url:{url:erpBase64, detail:"high"}},
-                                    {type:"text", text:"Image 2 (Order System):"},
-                                    {type:"image_url", image_url:{url:orderBase64, detail:"high"}}
-                                ]}
-                            ],
-                            max_tokens:800, temperature:0
-                        })
-                    });
-                    if(!res.ok) { let err = await res.json(); throw new Error(err.error?.message||"API Error"); }
-                    let data = await res.json();
-                    let str = data.choices[0].message.content.trim();
-                    str = str.replace(/^```json/,'').replace(/^```/,'').replace(/```$/,'').trim();
-                    resultObj = JSON.parse(str);
-                }
-
-                // Re-calculate the counts based precisely on the details array to avoid AI hallucination!
-                let cCode=0, cColor=0, cQty=0;
-                if(resultObj.details && resultObj.details.length>0) {
-                    resultObj.details.forEach(d => {
-                        const isErr = d.issue.includes('불일치') || d.issue.toLowerCase().includes('mismatch') || (d.issue !== '일치 (정상)' && d.issue !== 'Matched');
-                        if(isErr) {
-                            if(d.issue.includes('코드') || d.issue.includes('누락') || d.issue.includes('추가')) cCode++;
-                            if(d.issue.includes('색상')) cColor++;
-                            if(d.issue.includes('수량')) cQty++;
-                            if(!d.issue.includes('코드') && !d.issue.includes('색상') && !d.issue.includes('수량') && !d.issue.includes('누락') && !d.issue.includes('추가')) cCode++;
-                        }
-                    });
-                }
-                resultObj.errorSummary = { codeMismatch: cCode, colorMismatch: cColor, quantityMismatch: cQty };
-
-                // Render result
-                document.getElementById('resCode').innerHTML = `${resultObj.errorSummary.codeMismatch}<span class="text-xs ml-0.5 text-slate-400">건</span>`;
-                document.getElementById('resColor').innerHTML = `${resultObj.errorSummary.colorMismatch}<span class="text-xs ml-0.5 text-slate-400">건</span>`;
-                document.getElementById('resQty').innerHTML = `${resultObj.errorSummary.quantityMismatch}<span class="text-xs ml-0.5 text-slate-400">건</span>`;
-                
-                // Color highlight for summary cards
-                ['Code', 'Color', 'Qty'].forEach(typ => {
-                    const key = typ.toLowerCase() + 'Mismatch';
-                    const el = document.getElementById('card' + typ);
-                    if(resultObj.errorSummary[key] > 0) {
-                        el.className = "border border-red-200 rounded-lg p-3 text-center bg-red-50 text-red-900";
-                        el.querySelector('p:last-child').classList.add('text-red-700');
-                    } else {
-                        el.className = "border border-slate-200 rounded-lg p-3 text-center bg-slate-50";
-                        el.querySelector('p:last-child').classList.remove('text-red-700');
-                    }
-                });
-
-                const tbody = document.getElementById('resultTableBody');
-                tbody.innerHTML = '';
-                let hasIssue = false;
-                if(resultObj.details && resultObj.details.length>0) {
-                    resultObj.details.forEach(d => {
-                        const isErr = d.issue.includes('불일치') || d.issue.toLowerCase().includes('mismatch') || (d.issue !== '일치 (정상)' && d.issue !== 'Matched');
-                        if(isErr) hasIssue = true;
-                        
-                        const tr = document.createElement('tr');
-                        tr.className = isErr ? "bg-red-50/50" : "hover:bg-slate-50 transition-colors";
-                        
-                        const badge = isErr 
-                            ? `<span class="bg-red-100 text-red-700 font-bold px-2 py-1 rounded text-xs border border-red-200 shadow-sm">${d.issue}</span>`
-                            : `<span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-1 rounded text-xs border border-emerald-200 shadow-sm">${d.issue}</span>`;
-
-                        tr.innerHTML = `
-                            <td class="px-4 py-3 font-semibold text-slate-800">${d.productCode}</td>
-                            <td class="px-4 py-3">${d.erp}</td>
-                            <td class="px-4 py-3 ${isErr ? 'font-bold text-red-600' : 'font-medium text-emerald-600'}">${d.order}</td>
-                            <td class="px-4 py-3">${badge}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">No issues found. Everything perfectly matched.</td></tr>`;
-                }
-
-                const vBox = document.getElementById('verdictBox');
-                const vRisk = document.getElementById('verdictRisk');
-                const vIcon = document.getElementById('verdictIcon');
-                
-                if(resultObj.finalVerdict.level.includes('High') || hasIssue) {
-                    vBox.className = "rounded-xl p-4 mb-5 flex items-center gap-4 transition-colors bg-red-100 text-red-900 border border-red-200";
-                    vRisk.innerText = `하자 발생 가능성: 🚨 높음 (High Risk)`;
-                    vIcon.className = "w-6 h-6 text-red-600";
-                    vIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>`;
-                } else if(resultObj.finalVerdict.level.includes('Medium')) {
-                    vBox.className = "rounded-xl p-4 mb-5 flex items-center gap-4 transition-colors bg-orange-100 text-orange-900 border border-orange-200";
-                    vRisk.innerText = `하자 발생 가능성: ⚠️ 주의 (Medium Risk)`;
-                    vIcon.className = "w-6 h-6 text-orange-600";
-                } else {
-                    vBox.className = "rounded-xl p-4 mb-5 flex items-center gap-4 transition-colors bg-emerald-100 text-emerald-900 border border-emerald-200";
-                    vRisk.innerText = `하자 발생 가능성: ✅ 낮음 (Safe)`;
-                    vIcon.className = "w-6 h-6 text-emerald-600";
-                    vIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>`;
-                }
-                
-                document.getElementById('resCause').innerText = resultObj.finalVerdict.cause;
-                
-                lSec.classList.add('hidden');
-                lSec.classList.remove('flex');
-                document.getElementById('resultCard').classList.remove('hidden');
-                document.getElementById('resultCard').classList.add('flex');
-
-            } catch(e) {
-                lSec.classList.add('hidden');
-                lSec.classList.remove('flex');
-                document.getElementById('initPlaceholder').classList.remove('hidden');
-                
-                if (e.message.includes('Failed to fetch') || e.name === 'TypeError') {
-                    alert("OpenAI 서버와 통신할 수 없습니다. (네트워크/방화벽 문제)\n에러 내용: " + e.message);
-                } else {
-                    alert("OpenAI API 에서 거절당했습니다!\n[정확한 에러 원인]:\n" + e.message + "\n\n(참고: Incorrect API key = 키 잘못입력, quota = 결제 반영 지연 또는 크레딧 부족)");
-                }
-            }
-        });
-    </script>
+<!-- Included Custom Script -->
+<script src="script.js"></script>
 </body>
 </html>
